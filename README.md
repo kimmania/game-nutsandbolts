@@ -56,10 +56,40 @@ Pushes to `main` run tests, build, and deploy via GitHub Actions (same pattern a
 1. Repo **Settings → Pages → Build and deployment → Source:** GitHub Actions
 2. Live site: [https://kimmania.github.io/game-nutsandbolts/](https://kimmania.github.io/game-nutsandbolts/)
 
-## Install on iPhone / iPad
+## Install (PWA)
 
-1. Open the site in Safari
-2. Share → **Add to Home Screen**
+Works on **HTTPS** (GitHub Pages) or `npm run preview` locally.
+
+### iPhone / iPad (Safari)
+
+1. Open [the game](https://kimmania.github.io/game-nutsandbolts/) in **Safari** (not an in-app browser).
+2. Tap **Share** → **Add to Home Screen**.
+3. Launch from the home screen icon for standalone play.
+
+A one-time hint appears on first visit in iOS Safari (dismiss with ×; stored in `localStorage`).
+
+### Android (Chrome)
+
+1. Open the site in Chrome.
+2. Menu → **Install app** or **Add to Home screen** when offered.
+
+### After deploy
+
+The service worker uses **auto-update**. Level JSON is precached with the app shell and also fetched **network-first** so new level packs appear after you **Reload** when the “New version available” toast shows.
+
+## Lighthouse (quality check)
+
+```bash
+npm run build
+npm run lighthouse
+# In another terminal:
+npx lighthouse http://localhost:4173/game-nutsandbolts/ \
+  --form-factor=mobile \
+  --chrome-flags="--headless=new" \
+  --view
+```
+
+On a production build, recent runs hit **100** performance and **100** best-practices (mobile). Installability is covered by the web manifest, service worker, and icons — verify under Chrome DevTools → **Application** → Manifest / Service workers.
 
 ## License
 

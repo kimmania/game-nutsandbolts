@@ -1,8 +1,19 @@
 import { registerSW } from 'virtual:pwa-register';
 import { bootstrap } from './app';
+import { initInstallHint } from './ui/installHint';
+import { initServiceWorkerUpdates, showServiceWorkerUpdatePrompt } from './ui/swUpdate';
 
-registerSW({ immediate: true });
+initServiceWorkerUpdates();
 
-bootstrap().catch((error) => {
-  console.error('Failed to start app:', error);
+registerSW({
+  immediate: true,
+  onNeedRefresh() {
+    showServiceWorkerUpdatePrompt();
+  },
 });
+
+bootstrap()
+  .then(() => initInstallHint())
+  .catch((error) => {
+    console.error('Failed to start app:', error);
+  });

@@ -60,9 +60,9 @@ Work through this list top to bottom. Each item has clear **done when** criteria
 **Why:** Phase 3 was functional but not fully validated.
 
 **Tasks:**
-- [ ] Run Lighthouse (PWA + performance) on production build; fix regressions
-- [ ] First-visit hint: one-line “Add to Home Screen” for iOS (dismissible, `localStorage`)
-- [ ] Confirm service worker updates levels after deploy (cache bust if needed)
+- [x] Run Lighthouse (PWA + performance) on production build; fix regressions
+- [x] First-visit hint: one-line “Add to Home Screen” for iOS (dismissible, `localStorage`)
+- [x] Confirm service worker updates levels after deploy (precache + network-first levels, reload toast)
 
 **Done when:** Lighthouse PWA score ≥ 90 on mobile emulation; install path documented in README.
 

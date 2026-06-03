@@ -8,6 +8,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icons/apple-touch-icon.png'],
       manifest: {
+        id: '/game-nutsandbolts/',
         name: 'Nuts & Bolts',
         short_name: 'Nuts&Bolts',
         description: 'Unscrew plates and park bolts without jamming the spare holes.',
@@ -17,6 +18,7 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: '/game-nutsandbolts/',
         scope: '/game-nutsandbolts/',
+        categories: ['games'],
         icons: [
           {
             src: 'icons/icon-192.png',
@@ -37,19 +39,24 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
-        globIgnores: ['**/levels/**'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest,json}'],
+        cleanupOutdatedCaches: true,
         navigateFallback: '/game-nutsandbolts/index.html',
+        navigateFallbackDenylist: [/\/levels\//],
         runtimeCaching: [
           {
             urlPattern: ({ url }) =>
               url.pathname.includes('/levels/') && url.pathname.endsWith('.json'),
-            handler: 'CacheFirst',
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'level-packs',
+              networkTimeoutSeconds: 4,
               expiration: {
-                maxEntries: 32,
-                maxAgeSeconds: 60 * 60 * 24 * 365,
+                maxEntries: 40,
+                maxAgeSeconds: 60 * 60 * 24 * 7,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
               },
             },
           },
