@@ -54,3 +54,5 @@ Level JSON does not encode rotation. The renderer places each plate from anchor 
 ## Validation
 
 Run `npm test` — the `levels.test.ts` suite loads every indexed level and checks the schema plus initial game state.
+
+Run `npm run validate-levels` before shipping a new or edited level. It runs a **BFS solver** (`src/core/solver.ts`) that only uses the same pick/place rules as the game and fails CI if any indexed level cannot be won. The deploy workflow runs this check automatically.

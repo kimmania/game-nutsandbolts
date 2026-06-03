@@ -34,10 +34,10 @@ Work through this list top to bottom. Each item has clear **done when** criteria
 **Why:** Prevent impossible puzzles (e.g. old level 14) from shipping.
 
 **Tasks:**
-- [ ] Add `src/core/solver.ts` — BFS over game states (respect `canPickScrew` / `canPlaceScrew`, move limits)
-- [ ] Add `scripts/validate-levels.ts` — load all levels from index, assert each solvable
-- [ ] Wire `npm run validate-levels` and run in `.github/workflows/deploy.yml` before build
-- [ ] Document in README and `docs/LEVEL_FORMAT.md`
+- [x] Add `src/core/solver.ts` — BFS over game states (respect `canPickScrew` / `canPlaceScrew`, move limits)
+- [x] Add `scripts/validate-levels.ts` — load all levels from index, assert each solvable
+- [x] Wire `npm run validate-levels` and run in `.github/workflows/deploy.yml` before build
+- [x] Document in README and `docs/LEVEL_FORMAT.md`
 
 **Done when:** Breaking a level JSON fails CI; all current levels pass.
 
@@ -236,7 +236,7 @@ When all above are checked, tag `v1.0.0` in git.
 npm run dev          # local play
 npm test             # unit + level tests
 npm run build        # production build
-npm run validate-levels   # (after A2)
+npm run validate-levels   # BFS solvability (CI)
 ```
 
 ---
