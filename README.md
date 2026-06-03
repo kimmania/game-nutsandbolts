@@ -19,7 +19,7 @@ Inspired by the *nuts and bolts* screw-puzzle genre (layered plates, limited sta
 - 15 unique puzzle layouts (stacking, shared pins, chains, crosses, and more)
 - Level picker, progress unlock, in-progress save per level, and **undo** (⌘/Ctrl+Z)
 - Custom bolt-on-wood PWA icons
-- Sound effects and plate-drop animations (toggle in Settings)
+- Sound effects, plate-drop animations, and single-screw plate hang (toggle motion in Settings)
 - Reduce motion option (respects system preference by default)
 - Installable PWA (Add to Home Screen)
 - Pure TypeScript puzzle engine with unit tests

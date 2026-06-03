@@ -4,10 +4,24 @@ import {
   stashCapacity,
   stashUsedCount,
 } from '../core/board';
-import type { GameState, HoleState, PlateState } from '../core/types';
+import type { GameState } from '../core/types';
+import {
+  plateLayout,
+  plateLayoutRigidTransform,
+  screwsOnPlate,
+  type PlateLayout,
+} from './plateLayout';
+import {
+  BOARD_WOOD,
+  FLOATING_SCREW_X,
+  FLOATING_SCREW_Y,
+  PLATE_DROP_PX,
+  STASH_LABEL_Y,
+  VIEW_HEIGHT,
+  VIEW_WIDTH,
+} from './viewLayout';
 
-const VIEW_WIDTH = 400;
-const VIEW_HEIGHT = 460;
+const PLATE_CLIP_ID = 'plate-drop-clip';
 
 export type BoardRenderOptions = {
   reducedMotion?: boolean;
@@ -21,6 +35,7 @@ type BoardElements = {
   hintEl: HTMLElement;
   knownRemoved: Set<string>;
   dropTimers: number[];
+  plateScrewCounts: Map<string, number>;
 };
 
 export function createBoard(
@@ -37,16 +52,29 @@ export function createBoard(
   svg.setAttribute('aria-label', 'Puzzle board');
 
   const wood = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  wood.setAttribute('x', '24');
-  wood.setAttribute('y', '60');
-  wood.setAttribute('width', '352');
-  wood.setAttribute('height', '220');
+  wood.setAttribute('x', String(BOARD_WOOD.x));
+  wood.setAttribute('y', String(BOARD_WOOD.y));
+  wood.setAttribute('width', String(BOARD_WOOD.width));
+  wood.setAttribute('height', String(BOARD_WOOD.height));
   wood.setAttribute('rx', '16');
   wood.setAttribute('class', 'board-wood');
   svg.appendChild(wood);
 
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+  clipPath.setAttribute('id', PLATE_CLIP_ID);
+  const clipRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  clipRect.setAttribute('x', '0');
+  clipRect.setAttribute('y', '0');
+  clipRect.setAttribute('width', String(VIEW_WIDTH));
+  clipRect.setAttribute('height', String(STASH_LABEL_Y - 6));
+  clipPath.appendChild(clipRect);
+  defs.appendChild(clipPath);
+  svg.appendChild(defs);
+
   const platesLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   platesLayer.setAttribute('class', 'plates-layer');
+  platesLayer.setAttribute('clip-path', `url(#${PLATE_CLIP_ID})`);
   svg.appendChild(platesLayer);
 
   const screwsLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -58,8 +86,8 @@ export function createBoard(
   svg.appendChild(holesLayer);
 
   const stashLabel = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  stashLabel.setAttribute('x', '200');
-  stashLabel.setAttribute('y', '340');
+  stashLabel.setAttribute('x', String(FLOATING_SCREW_X));
+  stashLabel.setAttribute('y', String(STASH_LABEL_Y));
   stashLabel.setAttribute('text-anchor', 'middle');
   stashLabel.setAttribute('class', 'stash-label');
   stashLabel.textContent = 'Spare holes';
@@ -75,6 +103,7 @@ export function createBoard(
     hintEl,
     knownRemoved: new Set(),
     dropTimers: [],
+    plateScrewCounts: new Map(),
   };
 
   svg.addEventListener('click', (event) => {
@@ -87,74 +116,41 @@ export function createBoard(
   return board;
 }
 
-const SCREW_PAD = 24;
-
-function anchorHolesForPlate(plate: PlateState, holes: HoleState[]): HoleState[] {
-  return plate.anchors
-    .map((id) => holes.find((hole) => hole.id === id))
-    .filter((hole): hole is HoleState => hole !== undefined);
-}
-
-/** Size and position the plate so every anchor hole sits on the metal. */
-function plateLayout(
-  plate: PlateState,
-  holes: HoleState[],
-): { x: number; y: number; angle: number; width: number; height: number } {
-  const anchorHoles = anchorHolesForPlate(plate, holes);
-
-  if (anchorHoles.length === 0) {
-    return { x: 200, y: 180, angle: 0, width: plate.width, height: plate.height };
-  }
-
-  if (anchorHoles.length === 1) {
-    const [only] = anchorHoles;
-    return {
-      x: only.x,
-      y: only.y,
-      angle: 0,
-      width: plate.width,
-      height: plate.height,
-    };
-  }
-
-  const ordered = plate.anchors
-    .map((id) => anchorHoles.find((hole) => hole.id === id))
-    .filter((hole): hole is HoleState => hole !== undefined);
-  const [first, second] = ordered;
-  const angle =
-    (Math.atan2(second.y - first.y, second.x - first.x) * 180) / Math.PI;
-
-  const xs = anchorHoles.map((hole) => hole.x);
-  const ys = anchorHoles.map((hole) => hole.y);
-  const spanX = Math.max(...xs) - Math.min(...xs);
-  const spanY = Math.max(...ys) - Math.min(...ys);
-  const width = Math.max(plate.width, spanX + SCREW_PAD * 2);
-  const height = Math.max(plate.height, spanY + SCREW_PAD * 2);
-  const x = (Math.min(...xs) + Math.max(...xs)) / 2;
-  const y = (Math.min(...ys) + Math.max(...ys)) / 2;
-
-  return { x, y, angle, width, height };
-}
+const HANG_TILT_MS = 360;
 
 function appendPlateGraphic(
   layer: SVGGElement,
-  plate: PlateState,
-  holes: HoleState[],
+  layout: PlateLayout,
   className: string,
-): void {
-  const { x, y, angle, width, height } = plateLayout(plate, holes);
+  transform: string,
+): SVGGElement {
   const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
   group.setAttribute('class', className);
-  group.setAttribute('transform', `translate(${x} ${y}) rotate(${angle})`);
+  group.setAttribute('transform', transform);
 
   const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  rect.setAttribute('x', String(-width / 2));
-  rect.setAttribute('y', String(-height / 2));
-  rect.setAttribute('width', String(width));
-  rect.setAttribute('height', String(height));
+  rect.setAttribute('x', String(-layout.width / 2));
+  rect.setAttribute('y', String(-layout.height / 2));
+  rect.setAttribute('width', String(layout.width));
+  rect.setAttribute('height', String(layout.height));
   rect.setAttribute('rx', '8');
   group.appendChild(rect);
   layer.appendChild(group);
+  return group;
+}
+
+function animatePlateHang(
+  group: SVGGElement,
+  fromTransform: string,
+  toTransform: string,
+): void {
+  const animation = group.animate(
+    [{ transform: fromTransform }, { transform: toTransform }],
+    { duration: HANG_TILT_MS, easing: 'ease-out', fill: 'forwards' },
+  );
+  animation.onfinish = () => {
+    group.setAttribute('transform', toTransform);
+  };
 }
 
 function renderPlates(board: BoardElements, state: GameState, options: BoardRenderOptions): void {
@@ -162,6 +158,9 @@ function renderPlates(board: BoardElements, state: GameState, options: BoardRend
     window.clearTimeout(timer);
   }
   board.dropTimers = [];
+
+  const prevScrewCounts = board.plateScrewCounts;
+  const nextScrewCounts = new Map<string, number>();
 
   const removedNow = state.plates.filter((plate) => plate.removed);
   const newlyRemoved = removedNow.filter((plate) => !board.knownRemoved.has(plate.id));
@@ -174,12 +173,44 @@ function renderPlates(board: BoardElements, state: GameState, options: BoardRend
     .sort((a, b) => a.layer - b.layer);
 
   for (const plate of active) {
-    appendPlateGraphic(board.platesLayer, plate, state.holes, 'plate');
+    const screwCount = screwsOnPlate(plate, state.holes);
+    nextScrewCounts.set(plate.id, screwCount);
+
+    const layout = plateLayout(plate, state.holes, state.plates);
+    const prevCount = prevScrewCounts.get(plate.id);
+    const shouldTilt =
+      !options.reducedMotion &&
+      layout.mode === 'hang' &&
+      prevCount !== undefined &&
+      prevCount >= 2 &&
+      screwCount === 1;
+
+    const rigidTransform = plateLayoutRigidTransform(plate, state.holes);
+    const group = appendPlateGraphic(
+      board.platesLayer,
+      layout,
+      'plate',
+      shouldTilt ? rigidTransform : layout.transform,
+    );
+
+    if (shouldTilt) {
+      animatePlateHang(group, rigidTransform, layout.transform);
+    }
   }
 
   if (animateDrop) {
     for (const plate of newlyRemoved) {
-      appendPlateGraphic(board.platesLayer, plate, state.holes, 'plate plate-dropping');
+      const layout = plateLayout(plate, state.holes, state.plates);
+      const group = appendPlateGraphic(
+        board.platesLayer,
+        layout,
+        'plate plate-dropping',
+        layout.transform,
+      );
+      const match = layout.transform.match(/rotate\(([-\d.]+)\)/);
+      const angle = match ? match[1] : '0';
+      group.style.setProperty('--drop-r', `${angle}deg`);
+      group.style.setProperty('--drop-dy', `${PLATE_DROP_PX}px`);
     }
     const timer = window.setTimeout(() => {
       for (const node of board.platesLayer.querySelectorAll('.plate-dropping')) {
@@ -189,6 +220,7 @@ function renderPlates(board: BoardElements, state: GameState, options: BoardRend
     board.dropTimers.push(timer);
   }
 
+  board.plateScrewCounts = nextScrewCounts;
   board.knownRemoved = new Set(removedNow.map((plate) => plate.id));
 }
 
@@ -277,7 +309,7 @@ function renderScrews(
       'class',
       options.reducedMotion ? 'screw screw-floating' : 'screw screw-floating screw-picked',
     );
-    floater.setAttribute('transform', 'translate(200 420)');
+    floater.setAttribute('transform', `translate(${FLOATING_SCREW_X} ${FLOATING_SCREW_Y})`);
 
     const head = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     head.setAttribute('r', '22');
@@ -321,6 +353,7 @@ export function resetBoardAnimationState(board: BoardElements): void {
   }
   board.dropTimers = [];
   board.knownRemoved = new Set();
+  board.plateScrewCounts = new Map();
 }
 
 export function renderBoard(

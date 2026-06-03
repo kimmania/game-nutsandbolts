@@ -2,8 +2,9 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { createGameState, isWin, pickScrew, placeScrew } from '../src/core/board';
+import { createGameState, pickScrew, placeScrew } from '../src/core/board';
 import type { LevelDef } from '../src/core/types';
+import { canPlateHang, plateLayout, screwsOnPlate } from '../src/ui/plateLayout';
 
 const level8 = JSON.parse(
   readFileSync(
@@ -13,18 +14,15 @@ const level8 = JSON.parse(
 ) as LevelDef;
 
 describe('level 8 twin towers', () => {
-  it('is solvable', () => {
+  it('does not hang a tower while the cap still shares its top screw', () => {
     const state = createGameState(level8);
+    const left = state.plates.find((p) => p.id === 'left')!;
 
-    pickScrew(state, 'h1');
-    placeScrew(state, 's1');
-    pickScrew(state, 'h3');
-    placeScrew(state, 's2');
     pickScrew(state, 'h2');
-    placeScrew(state, 's3');
-    pickScrew(state, 'h4');
     placeScrew(state, 's1');
 
-    expect(isWin(state)).toBe(true);
+    expect(screwsOnPlate(left, state.holes)).toBe(1);
+    expect(canPlateHang(left, state.holes, state.plates)).toBe(false);
+    expect(plateLayout(left, state.holes, state.plates).mode).toBe('rigid');
   });
 });

@@ -5,9 +5,9 @@
     { "id": "h1", "x": 90, "y": 160, "kind": "board" },
     { "id": "h2", "x": 200, "y": 160, "kind": "board" },
     { "id": "h3", "x": 200, "y": 250, "kind": "board" },
-    { "id": "s1", "x": 120, "y": 390, "kind": "stash" },
-    { "id": "s2", "x": 200, "y": 390, "kind": "stash" },
-    { "id": "s3", "x": 280, "y": 390, "kind": "stash" }
+    { "id": "s1", "x": 120, "y": 458, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 458, "kind": "stash" },
+    { "id": "s3", "x": 280, "y": 458, "kind": "stash" }
   ],
   "plates": [
     { "id": "l", "layer": 0, "anchors": ["h1", "h2", "h3"], "width": 130, "height": 36 }

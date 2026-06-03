@@ -252,10 +252,10 @@ body {
 @keyframes float-pulse {
   0%,
   100% {
-    transform: translate(200px, 420px) scale(1);
+    transform: translate(200px, 498px) scale(1);
   }
   50% {
-    transform: translate(200px, 418px) scale(1.04);
+    transform: translate(200px, 496px) scale(1.04);
   }
 }
 
@@ -270,7 +270,8 @@ body {
 
 @keyframes plate-drop {
   to {
-    transform: translate(var(--drop-x, 0), calc(var(--drop-y, 0) + 80px)) rotate(var(--drop-r, 0deg));
+    transform: translate(var(--drop-x, 0), calc(var(--drop-y, 0) + var(--drop-dy, 56px)))
+      rotate(var(--drop-r, 0deg));
     opacity: 0;
   }
 }

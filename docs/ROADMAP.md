@@ -95,18 +95,18 @@ When a plate has **more than one** anchor in level data but **exactly one** anch
 **Edge cases to handle:**
 
 - 3+ anchors stepping down to 1 (intermediate 2-screw poses can stay rigid until only one remains).
-- Shared-pin holes (same hole, multiple plates): only the **top** active plate at that hole gets the hang pose; lower plates unchanged until exposed.
+- Shared-pin holes: a plate with one screw **does not hang** if another active plate still shares that screwed anchor (same physical pin).
 - Undo / restart / level load: angle is **recomputed** from holes + anchors (do not store tilt in undo snapshots).
 - **Reduce motion:** snap to final hang angle or skip tilt animation (match Settings / `prefers-reduced-motion`).
 
 **Tasks:**
 
-- [ ] Spec accepted (this section) — no ambiguity between “one anchor in JSON” vs “one screw left”
-- [ ] `plateLayout` (or helper): branch on **count of anchors with `screwId !== null`**
-- [ ] Pivot transform: origin at remaining screw; rotate so free end hangs down
-- [ ] CSS/SVG transition when count goes from 2→1 (and 1→0 uses existing drop)
-- [ ] Manual check on levels with 2- and 3-anchor plates (e.g. 4, 5, 14)
-- [ ] Optional: light test that hang angle is deterministic for a fixed board state
+- [x] Spec accepted (this section) — no ambiguity between “one anchor in JSON” vs “one screw left”
+- [x] `src/ui/plateLayout.ts` — branch on **count of anchors with `screwId !== null`**
+- [x] Pivot transform: origin at remaining screw; rotate so free end hangs down
+- [x] Web Animations tilt when count goes from 2→1 (snap when reduce motion; 1→0 uses existing drop)
+- [ ] Manual check on levels with 2- and 3-anchor plates (e.g. 4, 5, 14) after deploy
+- [x] Tests in `tests/plateLayout.test.ts`
 
 **Done when:** On a two-screw bar, removing one screw shows the bar tilted from the remaining bolt; with both screws in, the bar stays straight; win/drop/undo still behave correctly.
 

@@ -4,8 +4,8 @@
   "holes": [
     { "id": "h1", "x": 110, "y": 200, "kind": "board" },
     { "id": "h2", "x": 290, "y": 200, "kind": "board" },
-    { "id": "s1", "x": 130, "y": 360, "kind": "stash" },
-    { "id": "s2", "x": 270, "y": 360, "kind": "stash" }
+    { "id": "s1", "x": 130, "y": 458, "kind": "stash" },
+    { "id": "s2", "x": 270, "y": 458, "kind": "stash" }
   ],
   "plates": [
     {

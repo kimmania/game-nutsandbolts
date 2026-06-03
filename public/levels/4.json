@@ -7,8 +7,8 @@
     { "id": "h3", "x": 310, "y": 150, "kind": "board" },
     { "id": "h4", "x": 145, "y": 230, "kind": "board" },
     { "id": "h5", "x": 255, "y": 230, "kind": "board" },
-    { "id": "s1", "x": 160, "y": 390, "kind": "stash" },
-    { "id": "s2", "x": 240, "y": 390, "kind": "stash" }
+    { "id": "s1", "x": 160, "y": 458, "kind": "stash" },
+    { "id": "s2", "x": 240, "y": 458, "kind": "stash" }
   ],
   "plates": [
     {
