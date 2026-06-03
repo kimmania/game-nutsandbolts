@@ -6,6 +6,9 @@ import { loadSettings, saveSettings } from './game/settings';
 import { applySnapshot, captureSnapshot, type MoveSnapshot } from './game/history';
 import {
   clearSession,
+  findInProgressLevelIds,
+  findResumeLevel,
+  getCompletedLevelIds,
   loadProgress,
   loadSession,
   saveProgress,
@@ -63,7 +66,16 @@ export class NutsBoltsApp {
     );
 
     this.levelIds = await fetchLevelIndex();
-    await this.loadLevel(this.progress.currentLevel);
+
+    const resumeLevel = findResumeLevel(this.levelIds, this.progress.highestUnlocked);
+    const startLevel = resumeLevel ?? this.progress.currentLevel;
+    if (resumeLevel !== null) {
+      this.progress = { ...this.progress, currentLevel: resumeLevel };
+      saveProgress(this.progress);
+    }
+
+    await this.loadLevel(startLevel);
+    this.updateContinueBanner(resumeLevel);
   }
 
   private getCurrentLevelId(): number {
@@ -75,9 +87,27 @@ export class NutsBoltsApp {
       levelIds: this.levelIds,
       currentLevel: this.getCurrentLevelId(),
       highestUnlocked: this.progress.highestUnlocked,
+      completedLevelIds: getCompletedLevelIds(this.progress),
+      inProgressLevelIds: new Set(
+        findInProgressLevelIds(this.levelIds, this.progress.highestUnlocked),
+      ),
       onSelect: (id) => void this.goToLevel(id),
       onClose: closeLevelPicker,
     });
+  }
+
+  private updateContinueBanner(resumedLevel: number | null): void {
+    const banner = document.getElementById('continue-banner');
+    if (!banner) return;
+
+    if (resumedLevel === null) {
+      banner.classList.add('hidden');
+      banner.textContent = '';
+      return;
+    }
+
+    banner.textContent = `Continuing level ${resumedLevel} where you left off.`;
+    banner.classList.remove('hidden');
   }
 
   private openSettings(): void {
@@ -124,6 +154,7 @@ export class NutsBoltsApp {
       this.clearUndo();
       this.progress = { ...this.progress, currentLevel: levelId };
       saveProgress(this.progress);
+      this.updateContinueBanner(null);
       this.refresh();
     } catch (error) {
       console.error(error);

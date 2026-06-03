@@ -131,9 +131,9 @@ When a plate has **more than one** anchor in level data but **exactly one** anch
 **Why:** Easier navigation as level count grows.
 
 **Tasks:**
-- [ ] Show level name under number in picker (or tooltip)
-- [ ] Indicate completed vs locked vs current
-- [ ] Optional: “Continue” on load (resume last in-progress level)
+- [x] Indicate completed vs locked vs current vs in-progress (numbers only, no names)
+- [x] Picker legend + scrollable grid for 30 levels
+- [x] “Continue” on load (resume highest in-progress level; banner on boot)
 
 **Done when:** Picker scales to 30 levels without confusion.
 

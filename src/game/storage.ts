@@ -5,6 +5,8 @@ const STORAGE_KEY = 'nutsandbolts-progress';
 export type SavedProgress = {
   highestUnlocked: number;
   currentLevel: number;
+  /** Level ids cleared at least once (persisted on win). */
+  completedLevels?: number[];
 };
 
 export function loadProgress(): SavedProgress {
@@ -59,10 +61,45 @@ export function clearSession(levelId: number): void {
   localStorage.removeItem(`${STORAGE_KEY}:level:${levelId}`);
 }
 
+export function getCompletedLevelIds(progress: SavedProgress): Set<number> {
+  if (progress.completedLevels?.length) {
+    return new Set(progress.completedLevels);
+  }
+  const legacy: number[] = [];
+  for (let id = 1; id < progress.highestUnlocked; id++) {
+    legacy.push(id);
+  }
+  return new Set(legacy);
+}
+
+export function findInProgressLevelIds(
+  levelIds: number[],
+  highestUnlocked: number,
+): number[] {
+  return levelIds.filter((id) => {
+    if (id > highestUnlocked) return false;
+    const session = loadSession(id);
+    return session?.status === 'playing';
+  });
+}
+
+/** Prefer the highest unlocked level with a saved in-progress puzzle. */
+export function findResumeLevel(
+  levelIds: number[],
+  highestUnlocked: number,
+): number | null {
+  const inProgress = findInProgressLevelIds(levelIds, highestUnlocked);
+  if (inProgress.length === 0) return null;
+  return Math.max(...inProgress);
+}
+
 export function unlockNextLevel(progress: SavedProgress, completedLevelId: number): SavedProgress {
+  const completed = getCompletedLevelIds(progress);
+  completed.add(completedLevelId);
   const next = completedLevelId + 1;
   return {
     highestUnlocked: Math.max(progress.highestUnlocked, next),
     currentLevel: next,
+    completedLevels: [...completed].sort((a, b) => a - b),
   };
 }
