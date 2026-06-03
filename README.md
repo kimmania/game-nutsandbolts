@@ -17,7 +17,8 @@ Inspired by the *nuts and bolts* screw-puzzle genre (layered plates, limited sta
 
 - Tap-only controls (no drag)
 - 15 unique puzzle layouts (stacking, shared pins, chains, crosses, and more)
-- Level picker, progress unlock, and in-progress save per level
+- Level picker, progress unlock, in-progress save per level, and **undo** (⌘/Ctrl+Z)
+- Custom bolt-on-wood PWA icons
 - Sound effects and plate-drop animations (toggle in Settings)
 - Reduce motion option (respects system preference by default)
 - Installable PWA (Add to Home Screen)
@@ -38,10 +39,15 @@ Open the URL from the terminal (usually `http://localhost:5173/game-nutsandbolts
 | `npm run build` | Type-check and production build |
 | `npm run preview` | Preview production build |
 | `npm test` | Run unit tests |
+| `npm run generate-icons` | Regenerate PNG icons from `public/icons/icon.svg` |
 
 ## Levels
 
 Levels live in `public/levels/*.json`. See [docs/LEVEL_FORMAT.md](docs/LEVEL_FORMAT.md) for the schema. Add an id to `public/levels/index.json` to ship a new puzzle.
+
+## Roadmap
+
+Planned work is tracked in [docs/ROADMAP.md](docs/ROADMAP.md) — work through Phase A → B → C in order.
 
 ## GitHub Pages
 

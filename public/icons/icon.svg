@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Nuts and Bolts">
+  <rect width="512" height="512" rx="108" fill="#2d2416"/>
+  <rect x="48" y="48" width="416" height="416" rx="88" fill="#5c4a32" stroke="#4a3b28" stroke-width="8"/>
+  <rect x="96" y="300" width="320" height="56" rx="12" fill="#8b9cad" stroke="#6d7d8f" stroke-width="6"/>
+  <circle cx="256" cy="220" r="108" fill="#d4a84b" stroke="#9a7428" stroke-width="14"/>
+  <line x1="196" y1="220" x2="316" y2="220" stroke="#5a4518" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="160" cy="328" r="22" fill="#1f1810" stroke="#3a3024" stroke-width="6"/>
+  <circle cx="352" cy="328" r="22" fill="#1f1810" stroke="#3a3024" stroke-width="6"/>
+</svg>

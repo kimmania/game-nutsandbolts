@@ -2,12 +2,14 @@ export function bindControls(handlers: {
   onRestart: () => void;
   onNext: () => void;
   onPrev: () => void;
+  onUndo: () => void;
   onLevels: () => void;
   onSettings: () => void;
 }): void {
   document.getElementById('restart')?.addEventListener('click', handlers.onRestart);
   document.getElementById('next-level')?.addEventListener('click', handlers.onNext);
   document.getElementById('prev-level')?.addEventListener('click', handlers.onPrev);
+  document.getElementById('undo')?.addEventListener('click', handlers.onUndo);
   document.getElementById('levels-btn')?.addEventListener('click', handlers.onLevels);
   document.getElementById('settings-btn')?.addEventListener('click', handlers.onSettings);
 }
@@ -33,6 +35,11 @@ export function setNextEnabled(enabled: boolean): void {
 
 export function setPrevEnabled(enabled: boolean): void {
   const btn = document.getElementById('prev-level') as HTMLButtonElement | null;
+  if (btn) btn.disabled = !enabled;
+}
+
+export function setUndoEnabled(enabled: boolean): void {
+  const btn = document.getElementById('undo') as HTMLButtonElement | null;
   if (btn) btn.disabled = !enabled;
 }
 

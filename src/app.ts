@@ -3,6 +3,7 @@ import { fetchLevel, fetchLevelIndex } from './core/levels';
 import type { GameState, LevelDef } from './core/types';
 import { configureAudio, playSound, primeAudio } from './game/audio';
 import { loadSettings, saveSettings } from './game/settings';
+import { applySnapshot, captureSnapshot, type MoveSnapshot } from './game/history';
 import {
   clearSession,
   loadProgress,
@@ -16,6 +17,7 @@ import {
   bindControls,
   setNextEnabled,
   setPrevEnabled,
+  setUndoEnabled,
   setStatusChip,
   showWinBanner,
   updateHeader,
@@ -31,6 +33,7 @@ export class NutsBoltsApp {
   private settings = loadSettings();
   private loading = false;
   private lastRemovedCount = 0;
+  private undoSnapshot: MoveSnapshot | null = null;
   private board = createBoard(
     document.getElementById('board-host')!,
     document.getElementById('hint')!,
@@ -45,9 +48,12 @@ export class NutsBoltsApp {
       onRestart: () => this.handleRestart(),
       onNext: () => void this.goToLevel(this.getCurrentLevelId() + 1),
       onPrev: () => void this.goToLevel(this.getCurrentLevelId() - 1),
+      onUndo: () => this.handleUndo(),
       onLevels: () => this.openLevels(),
       onSettings: () => this.openSettings(),
     });
+
+    document.addEventListener('keydown', (event) => this.handleKeydown(event));
 
     document.getElementById('level-meta')?.addEventListener('click', () => this.openLevels());
     document.body.addEventListener(
@@ -115,6 +121,7 @@ export class NutsBoltsApp {
       }
 
       this.lastRemovedCount = this.state.plates.filter((plate) => plate.removed).length;
+      this.clearUndo();
       this.progress = { ...this.progress, currentLevel: levelId };
       saveProgress(this.progress);
       this.refresh();
@@ -133,15 +140,47 @@ export class NutsBoltsApp {
     await this.loadLevel(levelId);
   }
 
+  private clearUndo(): void {
+    this.undoSnapshot = null;
+  }
+
+  private handleUndo(): void {
+    if (!this.state || !this.undoSnapshot || this.state.status === 'won') return;
+
+    applySnapshot(this.state, this.undoSnapshot);
+    this.clearUndo();
+    this.lastRemovedCount = this.state.plates.filter((plate) => plate.removed).length;
+
+    if (this.state.status === 'playing') {
+      saveSession(this.state.levelId, this.state);
+    }
+
+    this.refresh();
+  }
+
+  private handleKeydown(event: KeyboardEvent): void {
+    if (!this.state || this.state.status === 'won') return;
+    if (!(event.metaKey || event.ctrlKey) || event.key !== 'z') return;
+
+    const target = event.target as HTMLElement;
+    if (target.tagName === 'INPUT' || target.tagName === 'SELECT') return;
+
+    event.preventDefault();
+    this.handleUndo();
+  }
+
   private handleHoleTap(holeId: string): void {
     if (!this.state || this.state.status === 'won') return;
 
+    const snapshot = captureSnapshot(this.state);
     const result = applyMove(this.state, holeId);
 
     if (result === 'ignored') {
       if (this.state.status === 'playing') playSound('tap');
       return;
     }
+
+    this.undoSnapshot = snapshot;
 
     if (result === 'picked') playSound('pick');
     if (result === 'placed') playSound('place');
@@ -154,6 +193,7 @@ export class NutsBoltsApp {
 
     if (isWin(this.state)) {
       this.state.status = 'won';
+      this.clearUndo();
       clearSession(this.state.levelId);
       playSound('win');
       const maxId = this.levelIds.at(-1) ?? this.state.levelId;
@@ -163,6 +203,7 @@ export class NutsBoltsApp {
       }
     } else if (this.state.status === 'stuck') {
       playSound('jam');
+      this.clearUndo();
       clearSession(this.state.levelId);
     } else if (this.state.status === 'playing') {
       saveSession(this.state.levelId, this.state);
@@ -176,6 +217,7 @@ export class NutsBoltsApp {
     resetGameState(this.state, this.levelDef);
     resetBoardAnimationState(this.board);
     this.lastRemovedCount = 0;
+    this.clearUndo();
     clearSession(this.state.levelId);
     this.refresh();
   }
@@ -195,6 +237,7 @@ export class NutsBoltsApp {
       this.state.levelId < lastLevel &&
         (this.state.status === 'won' || this.state.levelId < maxUnlocked),
     );
+    setUndoEnabled(this.undoSnapshot !== null && this.state.status === 'playing');
   }
 }
 
