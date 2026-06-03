@@ -17,6 +17,7 @@ import {
   applyTool,
   createEmptyDraft,
   draftFromLevel,
+  findHoleAtPointer,
   moveBoardHole,
   movePlateByDelta,
   moveStashHole,
@@ -30,7 +31,7 @@ const TOOL_HINTS: Record<EditorTool, string> = {
   'stash-hole': 'Tap near the spare-hole row to add a stash slot.',
   screw: 'Tap a board hole to toggle a starting screw.',
   'plate-anchor': 'Tap board holes to add or remove anchors on the selected plate.',
-  move: 'Drag a hole to reposition it. Drag a plate bar to move all its anchors together. Tap a plate to select it.',
+  move: 'Drag a board hole or spare slot to reposition it. Drag a plate bar to move all its anchors. Tap a plate to select it.',
   erase: 'Tap a hole to remove it.',
 };
 
@@ -229,23 +230,35 @@ export async function bootstrapEditor(): Promise<void> {
     render();
   }
 
+  function startHoleDrag(holeId: string, x: number, y: number): void {
+    const hole = draft.holes.find((h) => h.id === holeId);
+    if (!hole) return;
+
+    if (hole.kind === 'stash') {
+      drag = { kind: 'stash', holeId: hole.id, startX: x, originX: hole.x };
+      return;
+    }
+
+    drag = {
+      kind: 'hole',
+      holeId: hole.id,
+      startX: x,
+      startY: y,
+      originX: hole.x,
+      originY: hole.y,
+    };
+  }
+
   function handlePointer(x: number, y: number, target: EditorPointerTarget): void {
     if (tool === 'move') {
+      const holeAtPointer = findHoleAtPointer(draft, x, y);
+      if (holeAtPointer) {
+        startHoleDrag(holeAtPointer.id, x, y);
+        return;
+      }
+
       if (target.kind === 'hole') {
-        const hole = draft.holes.find((h) => h.id === target.holeId);
-        if (!hole) return;
-        if (hole.kind === 'stash') {
-          drag = { kind: 'stash', holeId: hole.id, startX: x, originX: hole.x };
-        } else {
-          drag = {
-            kind: 'hole',
-            holeId: hole.id,
-            startX: x,
-            startY: y,
-            originX: hole.x,
-            originY: hole.y,
-          };
-        }
+        startHoleDrag(target.holeId, x, y);
         return;
       }
 

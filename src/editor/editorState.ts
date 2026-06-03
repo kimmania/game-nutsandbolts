@@ -79,12 +79,43 @@ export function findHoleNear(
   radius = 22,
   exceptId?: string,
 ): HoleDef | undefined {
-  return draft.holes.find((hole) => {
-    if (exceptId && hole.id === exceptId) return false;
+  let best: HoleDef | undefined;
+  let bestDist = radius * radius;
+
+  for (const hole of draft.holes) {
+    if (exceptId && hole.id === exceptId) continue;
     const dx = hole.x - x;
     const dy = hole.y - y;
-    return dx * dx + dy * dy <= radius * radius;
-  });
+    const dist = dx * dx + dy * dy;
+    if (dist <= bestDist) {
+      bestDist = dist;
+      best = hole;
+    }
+  }
+
+  return best;
+}
+
+/** Best hole to grab when dragging — stash row uses a wide horizontal target. */
+export function findHoleAtPointer(draft: EditorDraft, x: number, y: number): HoleDef | undefined {
+  const direct = findHoleNear(draft, x, y, 28);
+  if (direct) return direct;
+
+  if (Math.abs(y - STASH_HOLE_Y) <= 40) {
+    let best: HoleDef | undefined;
+    let bestDx = 44;
+    for (const hole of draft.holes) {
+      if (hole.kind !== 'stash') continue;
+      const dx = Math.abs(hole.x - x);
+      if (dx < bestDx) {
+        bestDx = dx;
+        best = hole;
+      }
+    }
+    if (best) return best;
+  }
+
+  return findHoleNear(draft, x, y, 22);
 }
 
 export function moveBoardHole(draft: EditorDraft, holeId: string, x: number, y: number): boolean {

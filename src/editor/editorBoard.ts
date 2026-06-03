@@ -1,6 +1,6 @@
 import { createGameState } from '../core/board';
 import type { EditorDraft } from './editorState';
-import { findHoleNear, toLevelDef } from './editorState';
+import { findHoleAtPointer, toLevelDef } from './editorState';
 import { plateLayout } from '../ui/plateLayout';
 import {
   BOARD_WOOD,
@@ -93,7 +93,7 @@ export function createEditorBoard(host: HTMLElement, handlers: EditorBoardHandle
     if (event.button !== 0) return;
     const target = pointerTargetFromElement(event.target as Element);
     const point = clientToSvg(svg, event.clientX, event.clientY);
-    dragging = target.kind !== 'canvas';
+    dragging = true;
     svg.setPointerCapture(event.pointerId);
     handlers.onCanvasPointer(point.x, point.y, target);
     event.preventDefault();
@@ -166,6 +166,7 @@ export function renderEditorBoard(
   layers.appendChild(platesLayer);
 
   const holesLayer = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  holesLayer.setAttribute('class', 'editor-holes-layer');
   for (const hole of draft.holes) {
     const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
     group.dataset.holeId = hole.id;
@@ -188,7 +189,7 @@ export function renderEditorBoard(
     );
 
     const hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    hit.setAttribute('r', '22');
+    hit.setAttribute('r', hole.kind === 'stash' ? '28' : '24');
     hit.setAttribute('class', 'editor-hole-hit');
     group.appendChild(hit);
 
@@ -229,7 +230,7 @@ export function renderEditorBoard(
 
 /** Resolve a canvas point to hole/plate when not hitting SVG targets directly. */
 export function targetAtPoint(draft: EditorDraft, x: number, y: number): EditorPointerTarget {
-  const hole = findHoleNear(draft, x, y, 24);
+  const hole = findHoleAtPointer(draft, x, y);
   if (hole) return { kind: 'hole', holeId: hole.id };
   return { kind: 'canvas' };
 }
