@@ -75,14 +75,54 @@ function rigidAngleFromAnchors(ordered: HoleState[]): number {
   return (Math.atan2(second.y - first.y, second.x - first.x) * 180) / Math.PI;
 }
 
-function spanSize(anchorHoles: HoleState[], plate: PlateState): { width: number; height: number } {
-  const xs = anchorHoles.map((hole) => hole.x);
-  const ys = anchorHoles.map((hole) => hole.y);
-  const spanX = Math.max(...xs) - Math.min(...xs);
-  const spanY = Math.max(...ys) - Math.min(...ys);
+/**
+ * Bar length runs along local X (anchor line); thickness is local Y.
+ * Uses oriented spans — not axis-aligned bbox (which bloated vertical bars).
+ */
+function spanSize(
+  anchorHoles: HoleState[],
+  plate: PlateState,
+  rigidAngleDeg: number,
+): { width: number; height: number } {
+  if (anchorHoles.length === 0) {
+    return { width: plate.width, height: plate.height };
+  }
+
+  if (anchorHoles.length === 1) {
+    return { width: Math.max(plate.width, 60), height: plate.height };
+  }
+
+  const center = centroid(anchorHoles);
+  const rad = (-rigidAngleDeg * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+
+  let minAlong = Infinity;
+  let maxAlong = -Infinity;
+  let minPerp = Infinity;
+  let maxPerp = -Infinity;
+
+  for (const hole of anchorHoles) {
+    const dx = hole.x - center.x;
+    const dy = hole.y - center.y;
+    const along = dx * cos - dy * sin;
+    const perp = dx * sin + dy * cos;
+    minAlong = Math.min(minAlong, along);
+    maxAlong = Math.max(maxAlong, along);
+    minPerp = Math.min(minPerp, perp);
+    maxPerp = Math.max(maxPerp, perp);
+  }
+
+  const alongSpan = maxAlong - minAlong;
+  const perpSpan = maxPerp - minPerp;
+  const thickness =
+    perpSpan < 2
+      ? plate.height
+      : Math.max(plate.height, perpSpan + SCREW_PAD * 2);
+
   return {
-    width: Math.max(plate.width, spanX + SCREW_PAD * 2),
-    height: Math.max(plate.height, spanY + SCREW_PAD * 2),
+    width: Math.max(plate.width, alongSpan + SCREW_PAD * 2),
+    height: thickness,
   };
 }
 
@@ -121,7 +161,6 @@ function plateTransform(
 export function plateLayout(plate: PlateState, holes: HoleState[], plates: PlateState[]): PlateLayout {
   const anchorHoles = anchorHolesForPlate(plate, holes);
   const hang = canPlateHang(plate, holes, plates);
-  const { width, height } = spanSize(anchorHoles, plate);
 
   if (anchorHoles.length === 0) {
     const rigidAngle = 0;
@@ -140,6 +179,7 @@ export function plateLayout(plate: PlateState, holes: HoleState[], plates: Plate
     .filter((hole): hole is HoleState => hole !== undefined);
   const rigidAngle = rigidAngleFromAnchors(ordered);
   const center = centroid(anchorHoles);
+  const { width, height } = spanSize(anchorHoles, plate, rigidAngle);
 
   if (anchorHoles.length === 1) {
     const [only] = anchorHoles;

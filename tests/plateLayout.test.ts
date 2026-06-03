@@ -61,6 +61,26 @@ describe('plateLayout', () => {
     expect(layout.transform).toContain('translate(300 200)');
   });
 
+  it('keeps a vertical two-screw bar thin horizontally', () => {
+    const level: LevelDef = {
+      id: 98,
+      name: 'Vertical bar',
+      holes: [
+        { id: 'h1', x: 120, y: 160, kind: 'board' },
+        { id: 'h2', x: 120, y: 240, kind: 'board' },
+      ],
+      plates: [
+        { id: 'tower', layer: 0, anchors: ['h1', 'h2'], width: 70, height: 36 },
+      ],
+      screws: { h1: 'a', h2: 'b' },
+    };
+    const state = createGameState(level);
+    const layout = plateLayout(state.plates[0], state.holes, state.plates);
+
+    expect(layout.width).toBeLessThanOrEqual(130);
+    expect(layout.height).toBeLessThanOrEqual(40);
+  });
+
   it('hang transform pivots on the screw still in the board', () => {
     const state = createGameState(twoBarLevel);
     pickScrew(state, 'h2');

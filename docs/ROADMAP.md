@@ -158,10 +158,10 @@ When a plate has **more than one** anchor in level data but **exactly one** anch
 **Why:** Author levels without hand-editing JSON.
 
 **Tasks:**
-- [ ] Route or mode: `#edit` / `?edit=1` (dev-only flag optional)
-- [ ] Tap to place hole (board vs stash); tap to add plate anchors
-- [ ] Set layer, export JSON, copy to clipboard
-- [ ] Run solvability check on export before copy
+- [x] Route or mode: `#edit` / `?edit=1`
+- [x] Tap to place hole (board vs stash); tap to add plate anchors
+- [x] Set layer, export JSON, copy to clipboard
+- [x] Run solvability check on export before copy
 
 **Done when:** You can create a new 2-plate level in the editor and pass CI tests after dropping JSON into `public/levels/`.
 

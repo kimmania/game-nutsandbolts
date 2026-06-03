@@ -40,6 +40,7 @@ Open the URL from the terminal (usually `http://localhost:5173/game-nutsandbolts
 | `npm run preview` | Preview production build |
 | `npm test` | Run unit tests |
 | `npm run validate-levels` | BFS solvability check for every level in `index.json` |
+| Level editor | Add `?edit=1` or `#edit` to the game URL (see [LEVEL_FORMAT.md](docs/LEVEL_FORMAT.md)) |
 | `npm run generate-icons` | Regenerate PNG icons from `public/icons/icon.svg` |
 
 ## Levels
