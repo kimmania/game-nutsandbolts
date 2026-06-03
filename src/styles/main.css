@@ -1,0 +1,270 @@
+:root {
+  --bg: #2d2416;
+  --surface: #3d3224;
+  --wood: #5c4a32;
+  --wood-dark: #4a3b28;
+  --plate: #8b9cad;
+  --plate-edge: #6d7d8f;
+  --text: #f5efe6;
+  --text-muted: #c4b8a8;
+  --accent: #e8a838;
+  --accent-soft: rgba(232, 168, 56, 0.3);
+  --bolt: #d4a84b;
+  --bolt-active: #ffd76a;
+  --hole: #1f1810;
+  --stash-ring: #6b5a45;
+  --danger: #e07050;
+  --win: #7ecf8a;
+  --radius: 10px;
+  --btn-min: 44px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  touch-action: manipulation;
+  padding:
+    calc(10px + var(--safe-top))
+    calc(10px + var(--safe-right))
+    calc(10px + var(--safe-bottom))
+    calc(10px + var(--safe-left));
+}
+
+#app {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: calc(100dvh - 20px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.level-meta {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.status-chip {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--surface);
+}
+
+.status-chip[data-variant='won'] {
+  background: rgba(126, 207, 138, 0.2);
+  color: var(--win);
+}
+
+.status-chip[data-variant='stuck'] {
+  background: rgba(224, 112, 80, 0.2);
+  color: var(--danger);
+}
+
+.level-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  min-height: 1.3em;
+}
+
+.game-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board-host {
+  width: 100%;
+  max-width: 400px;
+}
+
+.puzzle-board {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.board-wood {
+  fill: var(--wood);
+  stroke: var(--wood-dark);
+  stroke-width: 3;
+}
+
+.plate {
+  pointer-events: none;
+}
+
+.plate rect {
+  fill: var(--plate);
+  stroke: var(--plate-edge);
+  stroke-width: 2;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.35));
+}
+
+.stash-label {
+  fill: var(--text-muted);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.hole-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.hole-ring {
+  fill: var(--hole);
+  stroke: var(--stash-ring);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.hole-board .hole-ring {
+  stroke: #3a3024;
+}
+
+.hole-pickable .hole-ring {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.hole-target .hole-ring {
+  fill: rgba(232, 168, 56, 0.15);
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.hole-disabled .hole-hit {
+  cursor: default;
+}
+
+.screw {
+  cursor: pointer;
+}
+
+.screw-hit {
+  fill: transparent;
+}
+
+.screw-head {
+  fill: var(--bolt);
+  stroke: #9a7428;
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.screw-head-active {
+  fill: var(--bolt-active);
+  filter: drop-shadow(0 0 8px var(--accent-soft));
+}
+
+.screw-slot {
+  stroke: #5a4518;
+  stroke-width: 3;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+
+.screw-floating {
+  pointer-events: none;
+  animation: float-pulse 1s ease-in-out infinite;
+}
+
+@keyframes float-pulse {
+  0%,
+  100% {
+    transform: translate(200px, 420px) scale(1);
+  }
+  50% {
+    transform: translate(200px, 418px) scale(1.04);
+  }
+}
+
+.win-banner {
+  text-align: center;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: rgba(126, 207, 138, 0.15);
+  color: var(--win);
+  font-weight: 600;
+}
+
+.win-banner.hidden {
+  display: none;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.btn {
+  min-height: var(--btn-min);
+  border: none;
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #2d2416;
+}
+
+.btn:active:not(:disabled) {
+  transform: scale(0.98);
+}

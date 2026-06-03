@@ -1,0 +1,33 @@
+{
+  "id": 5,
+  "name": "Shared pin",
+  "holes": [
+    { "id": "h1", "x": 90, "y": 260, "kind": "board" },
+    { "id": "h2", "x": 200, "y": 260, "kind": "board" },
+    { "id": "h4", "x": 200, "y": 150, "kind": "board" },
+    { "id": "s1", "x": 110, "y": 390, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 390, "kind": "stash" },
+    { "id": "s3", "x": 290, "y": 390, "kind": "stash" }
+  ],
+  "plates": [
+    {
+      "id": "p-base",
+      "layer": 0,
+      "anchors": ["h1", "h2"],
+      "width": 130,
+      "height": 40
+    },
+    {
+      "id": "p-cap",
+      "layer": 1,
+      "anchors": ["h2", "h4"],
+      "width": 130,
+      "height": 36
+    }
+  ],
+  "screws": {
+    "h1": "x1",
+    "h2": "x2",
+    "h4": "x4"
+  }
+}

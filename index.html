@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Nuts & Bolts" />
+    <meta name="theme-color" content="#2d2416" />
+    <meta
+      name="description"
+      content="Unscrew metal plates and park bolts in spare holes without jamming."
+    />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <title>Nuts & Bolts</title>
+    <link rel="stylesheet" href="/src/styles/main.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <div>
+          <h1 class="title">Nuts &amp; Bolts</h1>
+          <p id="level-meta" class="level-meta">Level 1</p>
+        </div>
+        <span id="status-chip" class="status-chip" data-variant="playing">Playing</span>
+      </header>
+
+      <p id="level-title" class="level-title">Loading…</p>
+      <p id="hint" class="hint" aria-live="polite">Tap a bolt to unscrew it.</p>
+
+      <main class="game-area">
+        <div id="board-host" class="board-host"></div>
+      </main>
+
+      <div id="win-banner" class="win-banner hidden" role="status">Level cleared!</div>
+
+      <footer class="controls" aria-label="Game controls">
+        <button type="button" id="prev-level" class="btn" disabled>Prev</button>
+        <button type="button" id="restart" class="btn btn-primary">Restart</button>
+        <button type="button" id="next-level" class="btn" disabled>Next</button>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

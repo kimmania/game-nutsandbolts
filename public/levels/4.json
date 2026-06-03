@@ -1,0 +1,36 @@
+{
+  "id": 4,
+  "name": "Tight stash",
+  "holes": [
+    { "id": "h1", "x": 90, "y": 150, "kind": "board" },
+    { "id": "h2", "x": 200, "y": 150, "kind": "board" },
+    { "id": "h3", "x": 310, "y": 150, "kind": "board" },
+    { "id": "h4", "x": 145, "y": 230, "kind": "board" },
+    { "id": "h5", "x": 255, "y": 230, "kind": "board" },
+    { "id": "s1", "x": 160, "y": 390, "kind": "stash" },
+    { "id": "s2", "x": 240, "y": 390, "kind": "stash" }
+  ],
+  "plates": [
+    {
+      "id": "p-a",
+      "layer": 0,
+      "anchors": ["h1", "h2", "h4"],
+      "width": 140,
+      "height": 34
+    },
+    {
+      "id": "p-b",
+      "layer": 0,
+      "anchors": ["h3", "h5"],
+      "width": 140,
+      "height": 34
+    }
+  ],
+  "screws": {
+    "h1": "b1",
+    "h2": "b2",
+    "h3": "b3",
+    "h4": "b4",
+    "h5": "b5"
+  }
+}

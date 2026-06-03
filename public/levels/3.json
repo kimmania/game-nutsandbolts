@@ -1,0 +1,35 @@
+{
+  "id": 3,
+  "name": "Stacked",
+  "holes": [
+    { "id": "h1", "x": 100, "y": 250, "kind": "board" },
+    { "id": "h2", "x": 300, "y": 250, "kind": "board" },
+    { "id": "h3", "x": 120, "y": 150, "kind": "board" },
+    { "id": "h4", "x": 280, "y": 150, "kind": "board" },
+    { "id": "s1", "x": 120, "y": 380, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 380, "kind": "stash" },
+    { "id": "s3", "x": 280, "y": 380, "kind": "stash" }
+  ],
+  "plates": [
+    {
+      "id": "p-base",
+      "layer": 0,
+      "anchors": ["h1", "h2"],
+      "width": 220,
+      "height": 40
+    },
+    {
+      "id": "p-cap",
+      "layer": 1,
+      "anchors": ["h3", "h4"],
+      "width": 180,
+      "height": 36
+    }
+  ],
+  "screws": {
+    "h1": "bolt-a",
+    "h2": "bolt-b",
+    "h3": "bolt-c",
+    "h4": "bolt-d"
+  }
+}

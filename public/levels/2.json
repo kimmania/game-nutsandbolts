@@ -1,0 +1,35 @@
+{
+  "id": 2,
+  "name": "Two bars",
+  "holes": [
+    { "id": "h1", "x": 90, "y": 160, "kind": "board" },
+    { "id": "h2", "x": 210, "y": 160, "kind": "board" },
+    { "id": "h3", "x": 310, "y": 160, "kind": "board" },
+    { "id": "h4", "x": 200, "y": 260, "kind": "board" },
+    { "id": "s1", "x": 120, "y": 380, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 380, "kind": "stash" },
+    { "id": "s3", "x": 280, "y": 380, "kind": "stash" }
+  ],
+  "plates": [
+    {
+      "id": "p-top",
+      "layer": 0,
+      "anchors": ["h1", "h2"],
+      "width": 140,
+      "height": 36
+    },
+    {
+      "id": "p-bottom",
+      "layer": 0,
+      "anchors": ["h3", "h4"],
+      "width": 140,
+      "height": 36
+    }
+  ],
+  "screws": {
+    "h1": "bolt-1",
+    "h2": "bolt-2",
+    "h3": "bolt-3",
+    "h4": "bolt-4"
+  }
+}
