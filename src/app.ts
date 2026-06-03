@@ -1,6 +1,8 @@
 import { applyMove, createGameState, isWin, resetGameState, statusLabel } from './core/board';
 import { fetchLevel, fetchLevelIndex } from './core/levels';
 import type { GameState, LevelDef } from './core/types';
+import { configureAudio, playSound, primeAudio } from './game/audio';
+import { loadSettings, saveSettings } from './game/settings';
 import {
   clearSession,
   loadProgress,
@@ -9,15 +11,26 @@ import {
   saveSession,
   unlockNextLevel,
 } from './game/storage';
-import { bindControls, setNextEnabled, setPrevEnabled, setStatusChip, showWinBanner, updateHeader } from './ui/controls';
-import { createBoard, renderBoard } from './ui/board';
+import { createBoard, renderBoard, resetBoardAnimationState } from './ui/board';
+import {
+  bindControls,
+  setNextEnabled,
+  setPrevEnabled,
+  setStatusChip,
+  showWinBanner,
+  updateHeader,
+} from './ui/controls';
+import { closeLevelPicker, openLevelPicker } from './ui/levelPicker';
+import { applyMotionClass, closeSettingsPanel, openSettingsPanel } from './ui/settingsPanel';
 
 export class NutsBoltsApp {
   private state: GameState | null = null;
   private levelDef: LevelDef | null = null;
   private levelIds: number[] = [];
   private progress = loadProgress();
+  private settings = loadSettings();
   private loading = false;
+  private lastRemovedCount = 0;
   private board = createBoard(
     document.getElementById('board-host')!,
     document.getElementById('hint')!,
@@ -25,11 +38,23 @@ export class NutsBoltsApp {
   );
 
   async init(): Promise<void> {
+    configureAudio(this.settings);
+    applyMotionClass(this.settings.reducedMotion);
+
     bindControls({
       onRestart: () => this.handleRestart(),
       onNext: () => void this.goToLevel(this.getCurrentLevelId() + 1),
       onPrev: () => void this.goToLevel(this.getCurrentLevelId() - 1),
+      onLevels: () => this.openLevels(),
+      onSettings: () => this.openSettings(),
     });
+
+    document.getElementById('level-meta')?.addEventListener('click', () => this.openLevels());
+    document.body.addEventListener(
+      'pointerdown',
+      () => primeAudio(),
+      { once: true },
+    );
 
     this.levelIds = await fetchLevelIndex();
     await this.loadLevel(this.progress.currentLevel);
@@ -37,6 +62,30 @@ export class NutsBoltsApp {
 
   private getCurrentLevelId(): number {
     return this.state?.levelId ?? this.progress.currentLevel;
+  }
+
+  private openLevels(): void {
+    openLevelPicker({
+      levelIds: this.levelIds,
+      currentLevel: this.getCurrentLevelId(),
+      highestUnlocked: this.progress.highestUnlocked,
+      onSelect: (id) => void this.goToLevel(id),
+      onClose: closeLevelPicker,
+    });
+  }
+
+  private openSettings(): void {
+    openSettingsPanel({
+      settings: this.settings,
+      onChange: (settings) => {
+        this.settings = settings;
+        saveSettings(settings);
+        configureAudio(settings);
+        applyMotionClass(settings.reducedMotion);
+        this.refresh();
+      },
+      onClose: closeSettingsPanel,
+    });
   }
 
   private async loadLevel(levelId: number): Promise<void> {
@@ -49,6 +98,7 @@ export class NutsBoltsApp {
     try {
       const level = await fetchLevel(levelId);
       this.levelDef = level;
+      resetBoardAnimationState(this.board);
 
       const session = loadSession(levelId);
       if (session && session.status === 'playing') {
@@ -64,6 +114,7 @@ export class NutsBoltsApp {
         this.state = createGameState(level);
       }
 
+      this.lastRemovedCount = this.state.plates.filter((plate) => plate.removed).length;
       this.progress = { ...this.progress, currentLevel: levelId };
       saveProgress(this.progress);
       this.refresh();
@@ -86,20 +137,35 @@ export class NutsBoltsApp {
     if (!this.state || this.state.status === 'won') return;
 
     const result = applyMove(this.state, holeId);
-    if (result === 'ignored') return;
+
+    if (result === 'ignored') {
+      if (this.state.status === 'playing') playSound('tap');
+      return;
+    }
+
+    if (result === 'picked') playSound('pick');
+    if (result === 'placed') playSound('place');
+
+    const removedCount = this.state.plates.filter((plate) => plate.removed).length;
+    if (removedCount > this.lastRemovedCount) {
+      playSound('drop');
+    }
+    this.lastRemovedCount = removedCount;
 
     if (isWin(this.state)) {
       this.state.status = 'won';
       clearSession(this.state.levelId);
+      playSound('win');
       const maxId = this.levelIds.at(-1) ?? this.state.levelId;
       if (this.state.levelId < maxId) {
         this.progress = unlockNextLevel(this.progress, this.state.levelId);
         saveProgress(this.progress);
       }
+    } else if (this.state.status === 'stuck') {
+      playSound('jam');
+      clearSession(this.state.levelId);
     } else if (this.state.status === 'playing') {
       saveSession(this.state.levelId, this.state);
-    } else {
-      clearSession(this.state.levelId);
     }
 
     this.refresh();
@@ -108,6 +174,8 @@ export class NutsBoltsApp {
   private handleRestart(): void {
     if (!this.state || !this.levelDef) return;
     resetGameState(this.state, this.levelDef);
+    resetBoardAnimationState(this.board);
+    this.lastRemovedCount = 0;
     clearSession(this.state.levelId);
     this.refresh();
   }
@@ -115,7 +183,7 @@ export class NutsBoltsApp {
   private refresh(): void {
     if (!this.state) return;
 
-    renderBoard(this.board, this.state);
+    renderBoard(this.board, this.state, { reducedMotion: this.settings.reducedMotion });
     updateHeader(this.state.levelName, this.state.levelId, this.levelIds.length);
     setStatusChip(statusLabel(this.state.status), this.state.status);
     showWinBanner(this.state.status === 'won');

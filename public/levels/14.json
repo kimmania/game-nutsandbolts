@@ -1,0 +1,19 @@
+{
+  "id": 14,
+  "name": "Hook and rail",
+  "holes": [
+    { "id": "h1", "x": 90, "y": 175, "kind": "board" },
+    { "id": "h2", "x": 185, "y": 140, "kind": "board" },
+    { "id": "h3", "x": 115, "y": 255, "kind": "board" },
+    { "id": "h4", "x": 275, "y": 175, "kind": "board" },
+    { "id": "h5", "x": 315, "y": 255, "kind": "board" },
+    { "id": "s1", "x": 110, "y": 390, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 390, "kind": "stash" },
+    { "id": "s3", "x": 290, "y": 390, "kind": "stash" }
+  ],
+  "plates": [
+    { "id": "hook", "layer": 0, "anchors": ["h1", "h2", "h3"], "width": 130, "height": 36 },
+    { "id": "rail", "layer": 0, "anchors": ["h4", "h5"], "width": 110, "height": 34 }
+  ],
+  "screws": { "h1": "a", "h2": "b", "h3": "c", "h4": "d", "h5": "e" }
+}

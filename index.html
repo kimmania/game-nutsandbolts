@@ -23,9 +23,21 @@
       <header class="header">
         <div>
           <h1 class="title">Nuts &amp; Bolts</h1>
-          <p id="level-meta" class="level-meta">Level 1</p>
+          <button type="button" id="level-meta" class="level-meta level-meta-btn">
+            Level 1
+          </button>
         </div>
-        <span id="status-chip" class="status-chip" data-variant="playing">Playing</span>
+        <div class="header-actions">
+          <button
+            type="button"
+            id="settings-btn"
+            class="btn btn-icon"
+            aria-label="Settings"
+          >
+            ⚙
+          </button>
+          <span id="status-chip" class="status-chip" data-variant="playing">Playing</span>
+        </div>
       </header>
 
       <p id="level-title" class="level-title">Loading…</p>
@@ -39,6 +51,7 @@
 
       <footer class="controls" aria-label="Game controls">
         <button type="button" id="prev-level" class="btn" disabled>Prev</button>
+        <button type="button" id="levels-btn" class="btn">Levels</button>
         <button type="button" id="restart" class="btn btn-primary">Restart</button>
         <button type="button" id="next-level" class="btn" disabled>Next</button>
       </footer>

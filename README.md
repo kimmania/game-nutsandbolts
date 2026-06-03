@@ -16,8 +16,10 @@ Inspired by the *nuts and bolts* screw-puzzle genre (layered plates, limited sta
 ## Features
 
 - Tap-only controls (no drag)
-- 5 tutorial levels with stacking and tight stash limits
-- Progress saved in `localStorage` (unlocked levels + in-progress puzzle)
+- 15 unique puzzle layouts (stacking, shared pins, chains, crosses, and more)
+- Level picker, progress unlock, and in-progress save per level
+- Sound effects and plate-drop animations (toggle in Settings)
+- Reduce motion option (respects system preference by default)
 - Installable PWA (Add to Home Screen)
 - Pure TypeScript puzzle engine with unit tests
 
@@ -39,7 +41,7 @@ Open the URL from the terminal (usually `http://localhost:5173/game-nutsandbolts
 
 ## Levels
 
-Levels live in `public/levels/*.json`. See `public/levels/1.json` for the schema (`holes`, `plates`, `screws`). Add an id to `public/levels/index.json` to ship a new puzzle.
+Levels live in `public/levels/*.json`. See [docs/LEVEL_FORMAT.md](docs/LEVEL_FORMAT.md) for the schema. Add an id to `public/levels/index.json` to ship a new puzzle.
 
 ## GitHub Pages
 

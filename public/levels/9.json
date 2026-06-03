@@ -1,0 +1,18 @@
+{
+  "id": 9,
+  "name": "Cross",
+  "holes": [
+    { "id": "h1", "x": 90, "y": 200, "kind": "board" },
+    { "id": "h2", "x": 200, "y": 200, "kind": "board" },
+    { "id": "h3", "x": 310, "y": 200, "kind": "board" },
+    { "id": "h4", "x": 200, "y": 125, "kind": "board" },
+    { "id": "s1", "x": 110, "y": 390, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 390, "kind": "stash" },
+    { "id": "s3", "x": 290, "y": 390, "kind": "stash" }
+  ],
+  "plates": [
+    { "id": "beam", "layer": 0, "anchors": ["h1", "h2", "h3"], "width": 240, "height": 36 },
+    { "id": "post", "layer": 1, "anchors": ["h2", "h4"], "width": 90, "height": 34 }
+  ],
+  "screws": { "h1": "a", "h2": "b", "h3": "c", "h4": "d" }
+}

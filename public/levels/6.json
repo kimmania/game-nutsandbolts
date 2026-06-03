@@ -1,0 +1,19 @@
+{
+  "id": 6,
+  "name": "Tripod",
+  "holes": [
+    { "id": "h1", "x": 95, "y": 235, "kind": "board" },
+    { "id": "h2", "x": 200, "y": 185, "kind": "board" },
+    { "id": "h3", "x": 305, "y": 235, "kind": "board" },
+    { "id": "h4", "x": 200, "y": 130, "kind": "board" },
+    { "id": "s1", "x": 110, "y": 390, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 390, "kind": "stash" },
+    { "id": "s3", "x": 290, "y": 390, "kind": "stash" }
+  ],
+  "plates": [
+    { "id": "left", "layer": 0, "anchors": ["h1", "h2"], "width": 120, "height": 34 },
+    { "id": "right", "layer": 0, "anchors": ["h2", "h3"], "width": 120, "height": 34 },
+    { "id": "top", "layer": 0, "anchors": ["h2", "h4"], "width": 90, "height": 32 }
+  ],
+  "screws": { "h1": "a", "h2": "b", "h3": "c", "h4": "d" }
+}

@@ -2,17 +2,24 @@ export function bindControls(handlers: {
   onRestart: () => void;
   onNext: () => void;
   onPrev: () => void;
+  onLevels: () => void;
+  onSettings: () => void;
 }): void {
   document.getElementById('restart')?.addEventListener('click', handlers.onRestart);
   document.getElementById('next-level')?.addEventListener('click', handlers.onNext);
   document.getElementById('prev-level')?.addEventListener('click', handlers.onPrev);
+  document.getElementById('levels-btn')?.addEventListener('click', handlers.onLevels);
+  document.getElementById('settings-btn')?.addEventListener('click', handlers.onSettings);
 }
 
 export function updateHeader(levelName: string, levelId: number, total: number): void {
   const title = document.getElementById('level-title');
   const meta = document.getElementById('level-meta');
   if (title) title.textContent = levelName;
-  if (meta) meta.textContent = `Level ${levelId} of ${total}`;
+  if (meta) {
+    meta.textContent = `Level ${levelId} of ${total}`;
+    meta.setAttribute('title', 'Open level list');
+  }
 }
 
 export function showWinBanner(show: boolean): void {

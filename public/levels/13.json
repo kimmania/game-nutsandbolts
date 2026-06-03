@@ -1,0 +1,19 @@
+{
+  "id": 13,
+  "name": "Chain",
+  "holes": [
+    { "id": "h1", "x": 85, "y": 200, "kind": "board" },
+    { "id": "h2", "x": 165, "y": 200, "kind": "board" },
+    { "id": "h3", "x": 245, "y": 200, "kind": "board" },
+    { "id": "h4", "x": 325, "y": 200, "kind": "board" },
+    { "id": "s1", "x": 100, "y": 390, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 390, "kind": "stash" },
+    { "id": "s3", "x": 300, "y": 390, "kind": "stash" }
+  ],
+  "plates": [
+    { "id": "a", "layer": 0, "anchors": ["h1", "h2"], "width": 90, "height": 32 },
+    { "id": "b", "layer": 0, "anchors": ["h2", "h3"], "width": 90, "height": 32 },
+    { "id": "c", "layer": 0, "anchors": ["h3", "h4"], "width": 90, "height": 32 }
+  ],
+  "screws": { "h1": "a", "h2": "b", "h3": "c", "h4": "d" }
+}

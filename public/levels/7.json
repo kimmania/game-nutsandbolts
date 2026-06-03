@@ -1,0 +1,21 @@
+{
+  "id": 7,
+  "name": "Staircase",
+  "holes": [
+    { "id": "h1", "x": 100, "y": 260, "kind": "board" },
+    { "id": "h2", "x": 300, "y": 260, "kind": "board" },
+    { "id": "h3", "x": 150, "y": 210, "kind": "board" },
+    { "id": "h4", "x": 250, "y": 210, "kind": "board" },
+    { "id": "h5", "x": 175, "y": 160, "kind": "board" },
+    { "id": "h6", "x": 225, "y": 160, "kind": "board" },
+    { "id": "s1", "x": 110, "y": 390, "kind": "stash" },
+    { "id": "s2", "x": 200, "y": 390, "kind": "stash" },
+    { "id": "s3", "x": 290, "y": 390, "kind": "stash" }
+  ],
+  "plates": [
+    { "id": "low", "layer": 0, "anchors": ["h1", "h2"], "width": 220, "height": 38 },
+    { "id": "mid", "layer": 1, "anchors": ["h3", "h4"], "width": 120, "height": 34 },
+    { "id": "top", "layer": 2, "anchors": ["h5", "h6"], "width": 80, "height": 32 }
+  ],
+  "screws": { "h1": "a", "h2": "b", "h3": "c", "h4": "d", "h5": "e", "h6": "f" }
+}
